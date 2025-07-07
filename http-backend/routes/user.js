@@ -31,7 +31,7 @@ userRouter.post("/signup", async function (req, res) {
     }
     const email = req.body.email;
     const password = req.body.password;
-    const firstName = reqcons.body.firstName;
+    const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     let errorthrown = false;
     try {
@@ -55,4 +55,40 @@ userRouter.post("/signup", async function (req, res) {
         })
     }
 });
+userRouter.post("/signin", async function (req, res) {
+    const email = req.body.email;
+    const password = req.body.password;
+    const response = await UserProfile.findOne({
+        email: email
+    })
+    if (!response) {
+        res.status(403).json({
+            message: "User does not exist"
+        })
+        return
+    }
+    try {
+        const comparepassword = await bcrypt.compare(password, response.password);
+        if (comparepassword) {
+            const token = jwt.sign({
+                id: response._id.toString()
+            }, process.env.JWT_SECRET);
+            res.json({
+                message: "You successfully logged in",
+                token: token,
+                userId: response._id.toString()
+            });
+        } else {
+            res.status(403).json({
+                message: "Wrong username or password"
+            });
+        }
+    } catch (error) {
+        res.status(403).json({
+            message: "Wrong username or password:",
+            error: error.message
+        })
+    }
+});
+
 export default userRouter;
