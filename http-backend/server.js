@@ -1,10 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
-
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-
+import userRouter from "./routes/user.js"; // Adjust the path as necessary
 const app = express();
 
 const allowedOrigins = [
@@ -22,7 +21,7 @@ app.use(
 );
 
 app.use(express.json());
-app.use("/user", adminRoutes);
+app.use("/user", userRouter);
 const PORT = process.env.PORT || 3000;
 console.log(`MongoDB URL : ${process.env.MONGO_URL}`);
 
